@@ -55,7 +55,7 @@ def samplePrice(data):
   return p
 
 class TradeSingleton:
-  def __init__(self,ibeg,price,pipsTP,pipsSL,direction = -1, dd=False):
+  def __init__(self,ibeg,price,pipsTP,pipsSL,direction = +0, dd=False):
     if direction == 0:
       self.direction = 1.0 if random.random() < 0.5 else -1.0
     else:
@@ -168,7 +168,7 @@ class TradeMultiple:
 
 
 class TradeMultiple2:
-  def __init__(self,ibeg,price,pipsTP,pipsSL,direction = -0, maxEntries=10):
+  def __init__(self,ibeg,price,pipsTP,pipsSL,direction = +1, maxEntries=10):
     self.entries = []
     t = TradeSingleton(ibeg, price,pipsTP,pipsSL,direction)
     self.direction = direction
@@ -203,7 +203,7 @@ class TradeMultiple2:
             iend, 
             samplePrice, 
             self.pipsTP + self.nextDrawdown, 
-            self.pipsSL, 
+            self.pipsSL - 0.5*self.nextDrawdown,
             direction)
 
         self.nextDrawdown += 50
@@ -346,7 +346,7 @@ def simulation(fig, data,plot=True, log=0):
   print "duration= %f " % (-1.0 if nWins == 0 else  duration/nWins)
   print " ----------- "
 
-  return winSum+lossSum
+  return [winSum+lossSum, drawDown]
 
 
 
@@ -375,11 +375,15 @@ elif 0:
   end = 12*4+9
 
 
-elif 1:
+elif 0:
 # RANGE
   beg = 12*4+3
   end = 12*4+6
 
+elif 0:
+# RANGE
+  beg = 12*9+2
+  end = 12*9+5
 
 elif 1:
 # BULL range
@@ -387,9 +391,10 @@ elif 1:
   end = 12*7+6
 
 elif 0:
-# range
-  beg = 12*7+3
-  end = 12*7+8
+# BEAR range
+  beg = 12*8-6
+  end = 12*8
+
 for d in data0:
   if d[0] > beg*30.4:
     data += [d]
@@ -409,17 +414,22 @@ if 0:
   sys.exit(0)
 
 plt.close('all')
-f, fig = plt.subplots(2)
+f, fig = plt.subplots(3)
 
 
 PLlist = []
-nSample =  100
+DDlist = []
+nSample =  99
 for i in range(nSample):
-  print "Sample %d out of %d  -- avgPL= %f +/- %f\n" % (
+  print "Sample %d out of %d  -- avgPL= %f +/- %f   avgDD= %f +/ %f \n" % (
       i, nSample, 
       0 if i == 0 else np.average(PLlist),
-      0 if i == 0 else np.std(PLlist))
-  PLlist += [simulation(fig[0], data,plot=False,log=0)]
+      0 if i == 0 else np.std(PLlist),
+      0 if i == 0 else np.average(DDlist),
+      0 if i == 0 else np.std(DDlist))
+  res = simulation(fig[0], data,plot=False,log=0)
+  PLlist += [res[0]]
+  DDlist += [res[1]]
 
 plotTradeData(fig[0],data)
 simulation(fig[0], data,log=1)
@@ -428,11 +438,21 @@ avgPL = np.average(PLlist)
 stdPL = np.std(PLlist)
 print " -------------------- "
 print "avgPL= %f +/ %f " % (avgPL, stdPL)
+
+avgDD = np.average(DDlist)
+stdDD = np.std(DDlist)
+print "avgDD= %f +/ %f " % (avgDD, stdDD)
 print " -------------------- "
 
 fig[1].plot([1,len(PLlist)+1], [avgPL, avgPL])
 fig[1].plot([1,len(PLlist)+1], [avgPL-stdPL, avgPL-stdPL], color='gray',ls='--')
 fig[1].plot([1,len(PLlist)+1], [avgPL+stdPL, avgPL+stdPL], color='gray',ls='--')
 fig[1].step(range(1,len(PLlist)+1),PLlist,marker='o',drawstyle='steps-mid')
+
+fig[2].plot([1,len(DDlist)+1], [avgDD, avgDD])
+fig[2].plot([1,len(DDlist)+1], [avgDD-stdDD, avgDD-stdDD], color='gray',ls='--')
+fig[2].plot([1,len(DDlist)+1], [avgDD+stdDD, avgDD+stdDD], color='gray',ls='--')
+fig[2].step(range(1,len(DDlist)+1),DDlist,marker='o',drawstyle='steps-mid')
+
 plt.show()
 
