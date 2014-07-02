@@ -168,12 +168,13 @@ class TradeMultiple:
 
 
 class TradeMultiple2:
-  def __init__(self,ibeg,price,pipsTP,pipsSL,direction = -1, maxEntries=10):
+  def __init__(self,ibeg,price,pipsTP,pipsSL,direction = -0, maxEntries=10):
     self.entries = []
     t = TradeSingleton(ibeg, price,pipsTP,pipsSL,direction)
     self.direction = direction
     self.entries += [t]
     self.netPL = 0
+    self.price = price
     self.pipsTP = pipsTP
     self.pipsSL = pipsSL
     self.maxEntries = maxEntries
@@ -239,6 +240,7 @@ elif 1:
 def tradeSimulator(data,beg=None,positionsMax = 4, nPipsTP=30, nPipsSL=100, log=1):
   if beg == None:
     beg = int(random.random()*len(data))
+
   t = Trade(beg, samplePrice(data[beg]),nPipsTP,nPipsSL)
 
   priceHi = 0
@@ -249,10 +251,12 @@ def tradeSimulator(data,beg=None,positionsMax = 4, nPipsTP=30, nPipsSL=100, log=
     ilast = i
     priceHi = getPriceHi(data[i]);
     priceLo = getPriceLo(data[i]);
+#    print i, t.price, priceLo, priceHi
     if t.exitTrade(i,priceHi, priceLo):
       break
 
   t.duration = data[t.iend][0] - data[t.ibeg][0]
+
   if log:
     print "netPL= %d   meanDuration= %d " % (t.returnInPips, t.duration)
 
@@ -269,12 +273,12 @@ def plotTradeData(fig,data, trade=None, color=0, offset=0, direction=1):
   yc = []
 
   beg = 0
-  end = len(data);
+  end = len(data)-1;
   if trade != None:
     beg = trade[0]
     end = trade[1]
 
-  for i in range(beg,end):
+  for i in range(beg,end+1):
     d   = data[i]
     x  += [d[0]]
     yh += [getPriceHi(d)]
@@ -292,8 +296,6 @@ def plotTradeData(fig,data, trade=None, color=0, offset=0, direction=1):
 
 #@jit
 def simulation(fig, data,plot=True, log=0):
-  nSample = 50
-
   nWins   = 0
   winSum  = 0
   lossSum = 0
@@ -307,6 +309,7 @@ def simulation(fig, data,plot=True, log=0):
   for i in range(len(data)):
     used += [False]
 
+  beg = 0;
   beg = int(random.random()*len(data)*0.2)
   i = 0;
   while beg < len(data)-1:
@@ -315,7 +318,7 @@ def simulation(fig, data,plot=True, log=0):
     net = t.returnInPips
     ibeg = t.ibeg
     iend = t.iend
-    dur = data[iend-1][0] - data[ibeg][0]
+    dur = data[iend][0] - data[ibeg][0]
     beg = iend
 
     flag = False
@@ -335,10 +338,10 @@ def simulation(fig, data,plot=True, log=0):
     else:
       lossSum += net
     if log:
-      print "trade= %d: [%f - %f] -- PL= %d   duration= %f dd= %d lev= %d:1 -- netPL= %d" % (i, data[t.ibeg][0], data[t.iend-1][0], net, dur, t.netDrawdown, t.leverage, winSum+lossSum)
+      print "trade= %d: [%d-%d] [%f-%f] -- PL= %d   duration= %f dd= %d lev= %d:1 -- netPL= %d" % (i, t.ibeg, t.iend, data[t.ibeg][0], data[t.iend][0], net, dur, t.netDrawdown, t.leverage, winSum+lossSum)
 
   print "nPipsTP= %d " % nPipsTP
-  print "nWins= %d [%f]  nLoss= %d [%f]  dd= %d  " % (nWins, nWins*100.0/i, i-nWins, 100.0-nWins*100.0/nSample, drawDown)
+  print "nWins= %d [%f]  nLoss= %d [%f]  dd= %d  " % (nWins, nWins*100.0/i, i-nWins, 100.0-nWins*100.0/i, drawDown)
   print "winSum= %d  lossSum= %d   net= %d " % (winSum, lossSum, winSum+lossSum)
   print "duration= %f " % (-1.0 if nWins == 0 else  duration/nWins)
   print " ----------- "
@@ -366,7 +369,7 @@ if 0:
   beg = 12*7
   end = 12*7+3
 
-elif 1:
+elif 0:
 # BEAR
   beg = 12*4+6
   end = 12*4+9
@@ -400,6 +403,10 @@ for d in data0:
 t0 = data[0][0]
 for d in data:
   d[0] -= t0
+
+if 0:
+  simulation(None, data,plot=False,log=1)
+  sys.exit(0)
 
 plt.close('all')
 f, fig = plt.subplots(2)
