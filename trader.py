@@ -299,7 +299,7 @@ def simulation(fig, data,plot=True, log=0):
   drawDown = 0
 
   nPipsTP = 50
-  nPipsSL = 400
+  nPipsSL = 200
 
   used = [];
   for i in range(len(data)):
@@ -357,16 +357,19 @@ beg = 12*4+6-0.5
 end = 12*5
 
 # BULL
-beg = 12*7
-end = 12*7+3
+if 1:
+  beg = 12*7
+  end = 12*7+3
 
+elif 0:
 # BULL range
-beg = 12*7+0
-end = 12*7+6
+  beg = 12*7+0
+  end = 12*7+6
 
+elif 1:
 # range
-beg = 12*7+3
-end = 12*7+8
+  beg = 12*7+3
+  end = 12*7+8
 for d in data0:
   if d[0] > beg*30.4:
     data += [d]
