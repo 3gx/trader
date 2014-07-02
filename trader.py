@@ -167,7 +167,7 @@ class TradeMultiple:
 
 
 class TradeMultiple2:
-  def __init__(self,ibeg,price,pipsTP,pipsSL,direction = 1, maxEntries=10):
+  def __init__(self,ibeg,price,pipsTP,pipsSL,direction = -1, maxEntries=10):
     self.entries = []
     t = TradeSingleton(ibeg, price,pipsTP,pipsSL,direction)
     self.direction = direction
@@ -362,11 +362,23 @@ beg = 12*4
 end = 12*8
 
 # BULL
-if 1:
+if 0:
   beg = 12*7
   end = 12*7+3
 
-elif 0:
+elif 1:
+# BEAR
+  beg = 12*4+6
+  end = 12*4+9
+
+
+elif 1:
+# RANGE
+  beg = 12*4+3
+  end = 12*4+6
+
+
+elif 1:
 # BULL range
   beg = 12*7+0
   end = 12*7+6
