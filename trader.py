@@ -181,6 +181,7 @@ class TradeMultiple2:
     self.nextDrawdown = 50
     self.ibeg = ibeg
     self.leverage = 1
+    self.nEntries = 1
 
   def exitTrade(self, iend, priceHi, priceLo):
     self.returnInPips = self.netPL
@@ -202,11 +203,11 @@ class TradeMultiple2:
         newEntry = TradeSingleton(
             iend, 
             samplePrice, 
-            self.pipsTP + self.nextDrawdown, 
-            self.pipsSL - 0.5*self.nextDrawdown,
+            min(self.pipsTP + 1.0*self.nextDrawdown,400),
+            max(self.pipsSL - 0.5*self.nextDrawdown,100),
             direction)
 
-        self.nextDrawdown += 50
+        self.nextDrawdown += int(50 + random.random()*25)
 
 
     for t in entries2rm:
@@ -215,6 +216,7 @@ class TradeMultiple2:
 
     if len(self.entries) < self.maxEntries and newEntry != None:
       self.entries += [newEntry]
+      self.nEntries += 1
 
     self.leverage = max(self.leverage, len(self.entries))
 
@@ -338,7 +340,9 @@ def simulation(fig, data,plot=True, log=0):
     else:
       lossSum += net
     if log:
-      print "trade= %d: [%d-%d] [%f-%f] -- PL= %d   duration= %f dd= %d lev= %d:1 -- netPL= %d" % (i, t.ibeg, t.iend, data[t.ibeg][0], data[t.iend][0], net, dur, t.netDrawdown, t.leverage, winSum+lossSum)
+      print "trade= %d: [%d-%d] [%f-%f] n= %d-- PL= %d   duration= %f dd= %d lev= %d:1 -- netPL= %d" % (
+          i, t.ibeg, t.iend, data[t.ibeg][0], data[t.iend][0], 
+          t.nEntries, net, dur, t.netDrawdown, t.leverage, winSum+lossSum)
 
   print "nPipsTP= %d " % nPipsTP
   print "nWins= %d [%f]  nLoss= %d [%f]  dd= %d  " % (nWins, nWins*100.0/i, i-nWins, 100.0-nWins*100.0/i, drawDown)
@@ -388,7 +392,7 @@ elif 0:
 elif 1:
 # BULL range
   beg = 12*7+0
-  end = 12*7+6
+  end = 12*7+7
 
 elif 0:
 # BEAR range
