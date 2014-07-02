@@ -451,11 +451,15 @@ print " -------------------- "
 fig[1].plot([1,len(PLlist)+1], [avgPL, avgPL])
 fig[1].plot([1,len(PLlist)+1], [avgPL-stdPL, avgPL-stdPL], color='gray',ls='--')
 fig[1].plot([1,len(PLlist)+1], [avgPL+stdPL, avgPL+stdPL], color='gray',ls='--')
+fig[1].plot([1,len(PLlist)+1], [avgPL-2*stdPL, avgPL-2*stdPL], color='gray',ls=':')
+fig[1].plot([1,len(PLlist)+1], [avgPL+2*stdPL, avgPL+2*stdPL], color='gray',ls=':')
 fig[1].step(range(1,len(PLlist)+1),PLlist,marker='o',drawstyle='steps-mid')
 
 fig[2].plot([1,len(DDlist)+1], [avgDD, avgDD])
 fig[2].plot([1,len(DDlist)+1], [avgDD-stdDD, avgDD-stdDD], color='gray',ls='--')
 fig[2].plot([1,len(DDlist)+1], [avgDD+stdDD, avgDD+stdDD], color='gray',ls='--')
+fig[2].plot([1,len(DDlist)+1], [avgDD-2*stdDD, avgDD-2*stdDD], color='gray',ls=':')
+fig[2].plot([1,len(DDlist)+1], [avgDD+2*stdDD, avgDD+2*stdDD], color='gray',ls=':')
 fig[2].step(range(1,len(DDlist)+1),DDlist,marker='o',drawstyle='steps-mid')
 
 plt.show()
