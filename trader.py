@@ -23,6 +23,7 @@ import datetime
 import random
 
 import matplotlib.pyplot as plt
+import numpy as np
 
 def readFX(fileName):
   data = []
@@ -392,21 +393,26 @@ f, fig = plt.subplots(2)
 
 
 PLlist = []
-win = 0
 nSample =  100
 for i in range(nSample):
-  print "Sample %d out of %d  -- avgPL= %f\n" % (i, nSample, 0 if i == 0 else win*1.0/i)
+  print "Sample %d out of %d  -- avgPL= %f +/- %f\n" % (
+      i, nSample, 
+      0 if i == 0 else np.average(PLlist),
+      0 if i == 0 else np.std(PLlist))
   PLlist += [simulation(fig[0], data,plot=False,log=0)]
-  win += PLlist[-1]
 
 plotTradeData(fig[0],data)
 simulation(fig[0], data,log=1)
 
+avgPL = np.average(PLlist)
+stdPL = np.std(PLlist)
 print " -------------------- "
-print "avgPL= %f" % (1.0*win/nSample)
+print "avgPL= %f +/ %f " % (avgPL, stdPL)
 print " -------------------- "
 
+fig[1].plot([1,len(PLlist)+1], [avgPL, avgPL])
+fig[1].plot([1,len(PLlist)+1], [avgPL-stdPL, avgPL-stdPL], color='gray',ls='--')
+fig[1].plot([1,len(PLlist)+1], [avgPL+stdPL, avgPL+stdPL], color='gray',ls='--')
 fig[1].step(range(1,len(PLlist)+1),PLlist,marker='o',drawstyle='steps-mid')
-fig[1].plot([1,len(PLlist)+1], [1.0*win/nSample, 1.0*win/nSample])
 plt.show()
 
