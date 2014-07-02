@@ -166,15 +166,15 @@ class TradeMultiple:
 
 
 class TradeMultiple2:
-  def __init__(self,ibeg,price,pipsTP,pipsSL,direction = 0, maxEntries=10):
+  def __init__(self,ibeg,price,pipsTP,pipsSL,direction = 1, maxEntries=10):
     self.entries = []
     t = TradeSingleton(ibeg, price,pipsTP,pipsSL,direction)
     self.direction = direction
     self.flipDirection = False
-    if (direction == 0):
+    if 0 and (direction == 0):
       self.direction = -t.direction
       self.flipDirection = True
-    if 1:
+    if 0:
       self.direction = 0
       self.flipDirection = False
 
@@ -299,7 +299,7 @@ def simulation(fig, data,plot=True, log=0):
   drawDown = 0
 
   nPipsTP = 50
-  nPipsSL = 200
+  nPipsSL = 400
 
   used = [];
   for i in range(len(data)):
@@ -356,6 +356,9 @@ data = []
 beg = 12*4+6-0.5
 end = 12*5
 
+beg = 12*4
+end = 12*8
+
 # BULL
 if 1:
   beg = 12*7
@@ -366,7 +369,7 @@ elif 0:
   beg = 12*7+0
   end = 12*7+6
 
-elif 1:
+elif 0:
 # range
   beg = 12*7+3
   end = 12*7+8
