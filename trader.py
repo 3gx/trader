@@ -282,6 +282,7 @@ def plotTradeData(fig,data, trade=None, color=0, offset=0, direction=1):
     yl += [getPriceLo(d)]
     yc += [(yh[-1] + yl[-1])*0.5 + offset]
 
+#  print len(x), len(yc)
   if trade == None:
 #    plt.step(x,yh, color='green')
 #    plt.step(x,yl, color='red')
@@ -314,7 +315,7 @@ def simulation(fig, data,plot=True, log=0):
     net = t.returnInPips
     ibeg = t.ibeg
     iend = t.iend
-    dur = iend - ibeg
+    dur = data[iend-1][0] - data[ibeg][0]
     beg = iend
 
     flag = False
@@ -327,7 +328,7 @@ def simulation(fig, data,plot=True, log=0):
     if plot:
       plotTradeData(fig, data,trade=[ibeg,iend],color=i,offset=offset,direction=t.direction)
     if log:
-      print "trade= %d: [%d %d] -- PL= %d   duration= %d dd= %d lev= %d:1" % (i, t.ibeg, t.iend, net, dur, t.netDrawdown, t.leverage)
+      print "trade= %d: [%f - %f] -- PL= %d   duration= %f dd= %d lev= %d:1" % (i, data[t.ibeg][0], data[t.iend-1][0], net, dur, t.netDrawdown, t.leverage)
     drawDown = min(drawDown, t.netDrawdown)
     if net >= nPipsTP:
       nWins += 1
