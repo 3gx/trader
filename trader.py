@@ -2,6 +2,7 @@
 
 
 
+#from numba import jit
 import sys
 import re
 def readFX1(fileName):
@@ -171,14 +172,6 @@ class TradeMultiple2:
     self.entries = []
     t = TradeSingleton(ibeg, price,pipsTP,pipsSL,direction)
     self.direction = direction
-    self.flipDirection = False
-    if 0 and (direction == 0):
-      self.direction = -t.direction
-      self.flipDirection = True
-    if 0:
-      self.direction = 0
-      self.flipDirection = False
-
     self.entries += [t]
     self.netPL = 0
     self.pipsTP = pipsTP
@@ -195,6 +188,9 @@ class TradeMultiple2:
 
     entries2rm  = []
     newEntry    = None
+    direction = self.direction
+#    if -self.netPL > 1000:
+#      direction = -self.direction
     for t in self.entries:
       if t.exitTrade(iend,priceHi,priceLo):
         entries2rm += [t]
@@ -207,9 +203,8 @@ class TradeMultiple2:
             samplePrice, 
             self.pipsTP + self.nextDrawdown, 
             self.pipsSL, 
-            self.direction)
-        if self.flipDirection:
-          self.direction = -self.direction
+            direction)
+
         self.nextDrawdown += 50
 
 
@@ -224,6 +219,10 @@ class TradeMultiple2:
 
     if len(self.entries) == 0:
       return True
+
+    if 0:
+      if -self.netDrawdown > 1000:
+        return True
 
     return False
 
@@ -291,6 +290,7 @@ def plotTradeData(fig,data, trade=None, color=0, offset=0, direction=1):
     ls = "-" if direction == 1 else '--'
     fig.plot(x,yc, color=color, lw=4,ls=ls)
 
+#@jit
 def simulation(fig, data,plot=True, log=0):
   nSample = 50
 
@@ -327,8 +327,6 @@ def simulation(fig, data,plot=True, log=0):
 
     if plot:
       plotTradeData(fig, data,trade=[ibeg,iend],color=i,offset=offset,direction=t.direction)
-    if log:
-      print "trade= %d: [%f - %f] -- PL= %d   duration= %f dd= %d lev= %d:1" % (i, data[t.ibeg][0], data[t.iend-1][0], net, dur, t.netDrawdown, t.leverage)
     drawDown = min(drawDown, t.netDrawdown)
     if net >= nPipsTP:
       nWins += 1
@@ -336,6 +334,8 @@ def simulation(fig, data,plot=True, log=0):
       duration += t.duration
     else:
       lossSum += net
+    if log:
+      print "trade= %d: [%f - %f] -- PL= %d   duration= %f dd= %d lev= %d:1 -- netPL= %d" % (i, data[t.ibeg][0], data[t.iend-1][0], net, dur, t.netDrawdown, t.leverage, winSum+lossSum)
 
   print "nPipsTP= %d " % nPipsTP
   print "nWins= %d [%f]  nLoss= %d [%f]  dd= %d  " % (nWins, nWins*100.0/i, i-nWins, 100.0-nWins*100.0/nSample, drawDown)
